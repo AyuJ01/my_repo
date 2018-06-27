@@ -36,7 +36,7 @@ soup = BS(page,"lxml")
 all_div = soup.find_all('div',class_ = "liststylecon")
 
 
-my_div = soup.find_all('div',{"id":"listContent"})
+#my_div = soup.find_all('div',{"id":"listContent"})
 location=[]
 area=[]
 status=[]
@@ -46,13 +46,27 @@ bath=[]
 deposit=[]
 furnished=[]
 price = []
-for section in my_div:
+for section in all_div:
     info = section.find_all('div',class_="proplisttext")
     for data in info:
         details = data.find_all('div',class_="propdetails")
         for i in details:
             loc = i.findAll('div',class_="col-sm-9")
-            #location
+#location
             raw = loc[0].text.strip()
             n_raw = raw[:raw.find("View on Map")].strip()
             location.append(n_raw)
+
+
+#bhk
+
+bhk=[]
+for section in all_div:
+    info = section.find_all('div',class_="row propheading")
+    for data in info:
+        details = data.find_all('div',class_="col-sm-7 col-md-7")
+        for i in details:
+            b = i.find('h2')
+            b = b.text.strip()
+            b=b[0]
+            bhk.append(int(b))
