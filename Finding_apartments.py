@@ -83,5 +83,16 @@ for section in all_div:
             raw = raw[0]
             area.append(int(raw))
 
-
+#price
+price=[]
+for section in all_div:
+    info = section.find_all('div',class_="proplisttext")
+    for data in info:
+        details = data.find_all('div',class_="row propheading")
+        for i in details:
+            loc = i.find('div',class_="pricesty")
+            raw = loc.text.strip()
+            raw = raw.replace(",","")
+            raw = raw.split()
+            price.append(float(raw[0]))
             
