@@ -26,7 +26,7 @@ def btn_click(browser_con):
         html_page = browser_con.page_source
     return html_page
 
-for i in range(0,42):
+for i in range(0,50):
     page = btn_click(browser)
 
 soup = BS(page,"lxml")
@@ -92,7 +92,7 @@ for section in all_div:
                     
             s=''.join(l)
             if len(s) == 0:
-                area.append(int('800'))
+                area.append(int('1000'))
             else:    
                 area.append(int(s))
 
@@ -121,7 +121,9 @@ df1 = pd.DataFrame(location,columns = ['Location'])
 df1['Area'] = area
 df1['BHK'] = bhk
 df1['price'] = price
-df1.to_csv("house_price_3.csv",index=False)
+df1.to_csv("house_price_final.csv",index=False)
+
+df1 = pd.read_csv("house_price_final.csv")
 
 df1 = pd.get_dummies(df1, columns=["Location"])
 features = df1.drop("price",axis=1).values
@@ -142,7 +144,7 @@ from sklearn.model_selection import train_test_split
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state = 0)
 
 
-#Fit Linear Regression
+#Fit Random forest Regression
 from sklearn.ensemble import RandomForestRegressor
 regressor = RandomForestRegressor(100,random_state=0)
 regressor.fit(features_train,labels_train)
@@ -151,4 +153,12 @@ score = regressor.score(features_test,labels_test)
 
 
 
+"""
+#fit linear regression
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(features_train,labels_train)
+pred = regressor.predict(features_test)
+score = regressor.score(features_test,labels_test)
 
+"""
