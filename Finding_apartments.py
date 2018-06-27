@@ -26,7 +26,7 @@ def btn_click(browser_con):
         html_page = browser_con.page_source
     return html_page
 
-for i in range(0,4):
+for i in range(0,42):
     page = btn_click(browser)
 
 soup = BS(page,"lxml")
@@ -46,13 +46,14 @@ bath=[]
 deposit=[]
 furnished=[]
 price = []
+#location
 for section in all_div:
     info = section.find_all('div',class_="proplisttext")
     for data in info:
         details = data.find_all('div',class_="propdetails")
         for i in details:
             loc = i.findAll('div',class_="col-sm-9")
-            #location
+            
             raw = loc[0].text.strip()
             n_raw = raw[:raw.find("View on Map")].strip()
             location.append(n_raw)
@@ -67,8 +68,11 @@ for section in all_div:
         for i in details:
             b = i.find('h2')
             b = b.text.strip()
-            b=b[0]
-            bhk.append(int(b))
+            if len(b)==0:
+                bhk.append(int('1'))
+            else:
+                b=b[0]
+                bhk.append(int(b))
 
 #area
 area=[]
@@ -78,10 +82,19 @@ for section in all_div:
         details = data.find_all('div',class_="propdetails")
         for i in details:
             loc = i.findAll('div',class_="col-sm-9")
-            #location
+            
             raw = loc[1].text.strip().split()
             raw = raw[0]
-            area.append(int(raw))
+            l=[]
+            for i in raw:
+                if i.isdigit():
+                    l.append(i)
+                    
+            s=''.join(l)
+            if len(s) == 0:
+                area.append(int('800'))
+            else:    
+                area.append(int(s))
 
 #price
 price=[]
@@ -94,5 +107,48 @@ for section in all_div:
             raw = loc.text.strip()
             raw = raw.replace(",","")
             raw = raw.split()
-            price.append(float(raw[0]))
+            if len(raw) == 3 and raw[1].lower() in ['lac','lacs','lakh','lakhs']:
+                price.append(int(float(raw[0])*100000))
+            else:
+                price.append(int(float(raw[0])))
             
+            
+        
+#Making the dataframe
+import pandas as pd
+
+df1 = pd.DataFrame(location,columns = ['Location'])
+df1['Area'] = area
+df1['BHK'] = bhk
+df1['price'] = price
+df1.to_csv("house_price_3.csv",index=False)
+
+df1 = pd.get_dummies(df1, columns=["Location"])
+features = df1.drop("price",axis=1).values
+labels = df1["price"].values
+        
+#Label Encoding
+#from sklearn.preprocessing import LabelEncoder
+#encoder = LabelEncoder()
+#features["Location"] = encoder.fit_transform(features["Location"])
+
+#features scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features = sc.fit_transform(features)
+
+#splitting the dataset
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state = 0)
+
+
+#Fit Linear Regression
+from sklearn.ensemble import RandomForestRegressor
+regressor = RandomForestRegressor(100,random_state=0)
+regressor.fit(features_train,labels_train)
+pred = regressor.predict(features_test)
+score = regressor.score(features_test,labels_test)
+
+
+
+
