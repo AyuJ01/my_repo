@@ -52,12 +52,11 @@ for section in all_div:
         details = data.find_all('div',class_="propdetails")
         for i in details:
             loc = i.findAll('div',class_="col-sm-9")
-#location
+            #location
             raw = loc[0].text.strip()
             n_raw = raw[:raw.find("View on Map")].strip()
             location.append(n_raw)
-
-
+            
 #bhk
 
 bhk=[]
@@ -70,3 +69,19 @@ for section in all_div:
             b = b.text.strip()
             b=b[0]
             bhk.append(int(b))
+
+#area
+area=[]
+for section in all_div:
+    info = section.find_all('div',class_="proplisttext")
+    for data in info:
+        details = data.find_all('div',class_="propdetails")
+        for i in details:
+            loc = i.findAll('div',class_="col-sm-9")
+            #location
+            raw = loc[1].text.strip().split()
+            raw = raw[0]
+            area.append(int(raw))
+
+
+            
