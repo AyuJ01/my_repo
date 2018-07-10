@@ -1,16 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 10 22:13:21 2018
 
-@author: Ayushi
-"""
 
 import cv2
 import numpy as np
 #import sqlite3
 
 lowerBound=np.array([33,80,40])
-upperBound=np.array([102,255,255])                          #33degree-102 degreee hue contains green color
+upperBound=np.array([102,255,255])      #33degree-102 degreee hue contains green color
 kernelOpen=np.ones((5,5))           #to remove extra noise which is smaller than this size
 kernelClose=np.ones((20,20))
 
@@ -34,9 +29,12 @@ while True:
     _,conts,h=cv2.findContours(maskFinal.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     cv2.drawContours(img,conts,-1,(255,0,0),3)
     #to draw a rectangle
+    
     for i in range(len(conts)):
-        x,y,w,h=cv2.boundingRect(conts)
+        x,y,w,h=cv2.boundingRect(conts[i])
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+        cv2.putText(img, str(i+1),(x, y+h),cv2.FONT_HERSHEY_COMPLEX_SMALL,1,(0,255,255))    
+    
         
     cv2.imshow('maskOpen',maskOpen)
     cv2.imshow('maskClose',maskClose)
@@ -44,8 +42,8 @@ while True:
     cv2.imshow('mask',mask)
     cv2.imshow('cam',img)
     cv2.waitKey(10)
-    
+    if cv2.waitKey(1)==ord('q'):
+        break
+
 cap.release()
 cv2.destroyAllWindows()
-
-    
